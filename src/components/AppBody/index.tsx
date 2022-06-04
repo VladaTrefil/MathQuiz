@@ -1,15 +1,31 @@
 import React from 'react'
 import Container from '@mui/material/Container'
 import Box from '@mui/material/Box'
-import Button from '@mui/material/Button'
+
+const styles = {
+  backgroundBox: {
+    minHeight: '100vh',
+    display: 'flex',
+    flexDirection: 'column',
+    justifyContent: 'center',
+    alignItems: 'center'
+  },
+  innerBox: {
+    py: 4,
+    px: 8,
+    boxShadow: '0 5px 15px rgba(0,0,0,.1)'
+  }
+}
 
 function AppBody() {
   return (
-    <Container>
-      <Box sx={{ p: 2 }}>
-        <Button>Click this</Button>
-      </Box>
-    </Container>
+    <Box sx={styles.backgroundBox}>
+      <Container>
+        <Box sx={styles.innerBox}>
+          App
+        </Box>
+      </Container>
+    </Box>
   )
 }
 

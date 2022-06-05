@@ -1,4 +1,5 @@
 import React from 'react'
+import Quiz from '../Quiz'
 import Container from '@mui/material/Container'
 import Box from '@mui/material/Box'
 
@@ -11,8 +12,8 @@ const styles = {
     alignItems: 'center'
   },
   innerBox: {
-    py: 4,
-    px: 8,
+    padding: 8,
+    paddingBottom: 10,
     boxShadow: '0 5px 15px rgba(0,0,0,.1)'
   }
 }
@@ -22,7 +23,7 @@ function AppBody() {
     <Box sx={styles.backgroundBox}>
       <Container>
         <Box sx={styles.innerBox}>
-          App
+          <Quiz/>
         </Box>
       </Container>
     </Box>

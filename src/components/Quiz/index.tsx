@@ -1,37 +1,31 @@
-import React from "react"
+import React from 'react'
 
+import QuizForm from './QuizForm'
 import Box from '@mui/material/Box'
-import Typography from '@mui/material/Typography'
-import TextField from '@mui/material/TextField'
-import Button from '@mui/material/Button'
+
+import { newEquation, Equation } from '../../utils/equation'
+
+type Status = {
+  success: boolean
+  submitted: boolean
+  new: boolean
+}
 
 type QuizProps = {}
 
 type QuizState = {
-  operation: string,
-  success: boolean,
-  submitted: boolean
-  submittedCount: number,
-  successCount: number,
-  variableA: number | null,
-  variableB: number | null,
-  result: number | null,
-  userInput: number | string
+  status: Status
+  submittedCount: number
+  successCount: number
+  equation: Equation | null
+  heading: string
 }
 
 const styles = {
   outerBox: {
     maxWidth: 800,
-    margin: '0 auto'
+    margin: '0 auto',
   },
-  heading: {
-    textAlign: 'center'
-  },
-  equationBox: {
-    display: 'flex',
-    justifyContent: 'center',
-    marginTop: 5
-  }
 }
 
 class Quiz extends React.Component<QuizProps, QuizState> {
@@ -39,76 +33,43 @@ class Quiz extends React.Component<QuizProps, QuizState> {
     super(props)
 
     this.state = {
-      operation: 'add',
-      success: false,
-      submitted: false,
+      status: {
+        submitted: false,
+        success: false,
+        new: true,
+      },
       submittedCount: 0,
       successCount: 0,
-      variableA: null,
-      variableB: null,
-      result: null,
-      userInput: ""
+      equation: null,
+      heading: '...',
     }
   }
 
-  getRandNumber(min: number, max: number): number {
-    return Math.floor(Math.random() * (max - min) + min)
+  componentDidMount = () => {
+    this.newEquation()
   }
 
-  setNewEquation() {
-    const a = this.getRandNumber(100, 1000)
-    const b = this.getRandNumber(100, 1000)
-
+  newEquation = () => {
     this.setState({
-      variableA: a,
-      variableB: b,
-      result: a + b,
-      userInput: ''
+      equation: newEquation(1, 10, 'add'),
+      status: {
+        submitted: false,
+        success: false,
+        new: true,
+      },
     })
-  }
-
-  componentDidMount() {
-    this.setNewEquation()
-  }
-
-  handleInputChange = (e: any) => {
-    e.preventDefault()
-
-    if (e.target.value !== '') {
-      this.setState({ userInput: parseInt(e.target.value) })
-    } else {
-      this.setState({ userInput: '' })
-    }
-  }
-
-  handleFormSubmit = (e: any) => {
-    e.preventDefault()
-
-    this.setState({
-      submitted: true,
-      submittedCount: this.state.submittedCount + 1
-    })
-
-    if (this.state.userInput === this.state.result) {
-      this.setState({ 
-        success: true,
-        successCount: this.state.successCount + 1
-      })
-
-      this.setNewEquation()
-   } else {
-      this.setState({ success: false })
-    }
   }
 
   renderNotice = (): string | null => {
-    if (this.state.submitted) {
-      if (this.state.success) {
-        return "Success"
+    const status = this.state.status
+
+    if (status.submitted) {
+      if (status.success) {
+        return 'Success'
       } else {
-        return "Failure"
+        return 'Failure'
       }
-    } 
+    }
 
     return null
   }
@@ -121,27 +82,31 @@ class Quiz extends React.Component<QuizProps, QuizState> {
     }
   }
 
+  onFormSubmit = (success: boolean) => {
+    if (this.state.status.new) {
+      this.setState({ submittedCount: this.state.submittedCount + 1 })
+    }
+
+    this.setState({
+      status: {
+        submitted: true,
+        success: success,
+        new: false,
+      },
+    })
+
+    if (success) {
+      this.setState({ successCount: this.state.successCount + 1 })
+      this.newEquation()
+    }
+  }
+
   render() {
     return (
       <Box sx={styles.outerBox}>
         {this.renderNotice()}
 
-        <Typography variant="h2" sx={styles.heading}>
-          {this.state.variableA} + {this.state.variableB}
-        </Typography>
-
-        <form action="get" onSubmit={this.handleFormSubmit}>
-          <Box sx={styles.equationBox}>
-            <TextField
-              label="Result"
-              variant="outlined"
-              type="number"
-              onChange={this.handleInputChange}
-              value={this.state.userInput}/>
-
-            <Button variant="contained" size="large" sx={{ ml: 2, px: 5 }}>Submit</Button>
-          </Box>
-        </form>
+        <QuizForm equation={this.state.equation} onSubmit={this.onFormSubmit} />
 
         {this.renderStatus()}
       </Box>

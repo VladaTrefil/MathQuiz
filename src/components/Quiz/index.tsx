@@ -1,11 +1,13 @@
 import React from 'react'
 
 import QuizForm from './QuizForm'
-import Box from '@mui/material/Box'
+import QuizNotice from './QuizNotice'
 
 import { newEquation, Equation } from '../../utils/equation'
 
-type Status = {
+import Box from '@mui/material/Box'
+
+export type Status = {
   success: boolean
   submitted: boolean
   new: boolean
@@ -18,7 +20,7 @@ type QuizState = {
   submittedCount: number
   successCount: number
   equation: Equation | null
-  heading: string
+  noticeMessage: string | null
 }
 
 const styles = {
@@ -41,7 +43,7 @@ class Quiz extends React.Component<QuizProps, QuizState> {
       submittedCount: 0,
       successCount: 0,
       equation: null,
-      heading: '...',
+      noticeMessage: null
     }
   }
 
@@ -60,20 +62,6 @@ class Quiz extends React.Component<QuizProps, QuizState> {
     })
   }
 
-  renderNotice = (): string | null => {
-    const status = this.state.status
-
-    if (status.submitted) {
-      if (status.success) {
-        return 'Success'
-      } else {
-        return 'Failure'
-      }
-    }
-
-    return null
-  }
-
   renderStatus = (): string | null => {
     if (this.state.submittedCount > 0) {
       return `${this.state.successCount}/${this.state.submittedCount}`
@@ -85,6 +73,10 @@ class Quiz extends React.Component<QuizProps, QuizState> {
   onFormSubmit = (success: boolean) => {
     if (this.state.status.new) {
       this.setState({ submittedCount: this.state.submittedCount + 1 })
+
+      if (success) {
+        this.setState({ successCount: this.state.successCount + 1 })
+      }
     }
 
     this.setState({
@@ -96,15 +88,17 @@ class Quiz extends React.Component<QuizProps, QuizState> {
     })
 
     if (success) {
-      this.setState({ successCount: this.state.successCount + 1 })
       this.newEquation()
+      this.setState({ noticeMessage: 'Success' })
+    } else {
+      this.setState({ noticeMessage: 'Failure' })
     }
   }
 
   render() {
     return (
       <Box sx={styles.outerBox}>
-        {this.renderNotice()}
+        <QuizNotice message={this.state.noticeMessage} />
 
         <QuizForm equation={this.state.equation} onSubmit={this.onFormSubmit} />
 
